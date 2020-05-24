@@ -9,6 +9,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Redirect } from "react-router-dom";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 import api from "../../service/api";
 
@@ -52,6 +57,7 @@ export default function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState(0);
+  const [open, setOpen] = React.useState(false);
 
   async function login() {
     const obj = { user, password };
@@ -61,6 +67,14 @@ export default function Login() {
       setStatus(response.status);
     }
   }
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -105,7 +119,7 @@ export default function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Linki href="#" variant="body2">
+              <Linki onClick={handleClickOpen} variant="body2">
                 Esqueceu a senha?
               </Linki>
             </Grid>
@@ -117,6 +131,38 @@ export default function Login() {
             {status === 200 && <Redirect to="/home" />}
           </Grid>
         </form>
+        <Dialog
+          fullWidth
+          maxWidth="sm"
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Recuperar senha"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Para recuperar sua senha, digite seu email
+            </DialogContentText>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              onChange={(e) => setUser(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary" autoFocus>
+              Enviar
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
       <Box mt={8}>
         <Copyright />

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://whatevertech.azurewebsites.net/api",
+  baseURL: "https://whatevertechapi.azurewebsites.net/api",
 });
 
 export default api;
