@@ -1,47 +1,43 @@
-import React, {useState} from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import React, { useState } from "react";
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
 import { Link } from "react-router-dom";
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
 import api from "../../service/api";
-
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-     
+      {"Copyright © "}
       Desenvolvido por WhateverTech
-      
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
 
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -49,34 +45,41 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
+export default function SignUp() {
   const classes = useStyles();
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [cpassword, setCpassword] = useState("");
   const [email, setEmail] = useState("");
-  
-  
-  async function register(e) { 
-    e.preventDefault() 
+  const [open, setOpen] = React.useState(false);
+  const [status, setStatus] = useState(false);
 
-    console.log("register") 
-    const obj = { username: user, password, email, cpassword }; 
-if(user == '' || password == '' || email == ''){
-  
-  alert('Todos os campos devem estar preenchidos')
-  return false; 
-  console.log(password)
-console.log(cpassword)
-  if(password === cpassword){
-    alert('As senhas não correspondem')
-    return false; }
+  async function register(e) {
+    e.preventDefault();
 
-}
+    console.log("register");
+    const obj = { username: user, password, email };
+    if (user === "" || password === "" || email === "" || cpassword === "") {
+      alert("Todos os campos devem estar preenchidos");
+      return;
+    }
+
+    if (password !== cpassword) {
+      alert("As senhas não correspondem");
+      return;
+    }
     const response = await api.post("/register", obj);
-  console.log(response)
+    setStatus(response.status);
+    setOpen(true);
   }
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -88,8 +91,13 @@ console.log(cpassword)
         <Typography component="h1" variant="h5">
           Cadastre-se
         </Typography>
-        <form className={classes.form} noValidate onsubmit="return validar()">
-        <Grid container spacing={2}>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+            Usuário criado: {status}
+          </Alert>
+        </Snackbar>
+        <form className={classes.form} noValidate>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 autoComplete="fname"
@@ -102,8 +110,6 @@ console.log(cpassword)
                 autoFocus
                 onChange={(e) => setUser(e.target.value)}
               />
-             
-           
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -129,7 +135,6 @@ console.log(cpassword)
                 autoComplete="current-password"
                 onChange={(e) => setPassword(e.target.value)}
               />
-        
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -141,11 +146,9 @@ console.log(cpassword)
                 type="password"
                 id="cpassword"
                 autoComplete="current-password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setCpassword(e.target.value)}
               />
-        
             </Grid>
-            
           </Grid>
           <Button
             type="submit"
@@ -155,10 +158,10 @@ console.log(cpassword)
             className={classes.submit}
             onClick={(e) => register(e)}
           >
-            Cadastre-se 
+            Cadastre-se
           </Button>
           <Grid container justify="flex-end">
-          <Grid item>
+            <Grid item>
               <Link to="/" variant="body2">
                 {"Já possui uma conta? Conecte-se"}
               </Link>

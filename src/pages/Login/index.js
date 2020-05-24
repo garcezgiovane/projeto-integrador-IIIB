@@ -8,12 +8,13 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Redirect } from "react-router-dom";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 import api from "../../service/api";
 
@@ -52,34 +53,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function Login() {
   const classes = useStyles();
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState(0);
+  const [status, setStatus] = useState(false);
   const [open, setOpen] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
 
   async function login() {
-    const obj = { user, password };
-    const response = await api.post("/company/login", obj);
-    if (response.status === 200) {
-      await localStorage.setItem("token", response.status);
-      setStatus(response.status);
-    }
+    const obj = { username: user, password };
+    const response = await api.post("/login", obj);
+    setStatus(response.status);
+    setOpen(true);
   }
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenModal(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setOpenModal(false);
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+            Status da requisição: {status}
+          </Alert>
+        </Snackbar>
         <Typography variant="h5" gutterBottom>
           Projeto Integrador III-B
         </Typography>
@@ -89,10 +99,10 @@ export default function Login() {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email"
-            name="email"
-            autoComplete="email"
+            id="user"
+            label="Usuário"
+            name="user"
+            autoComplete="user"
             autoFocus
             onChange={(e) => setUser(e.target.value)}
           />
@@ -128,13 +138,12 @@ export default function Login() {
                 {"Ainda não tem uma conta? Inscreva-se"}
               </Link>
             </Grid>
-            {status === 200 && <Redirect to="/home" />}
           </Grid>
         </form>
         <Dialog
           fullWidth
           maxWidth="sm"
-          open={open}
+          open={openModal}
           onClose={handleClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
