@@ -61,7 +61,6 @@ export default function SignUp() {
   async function register(e) {
     e.preventDefault();
 
-    console.log("register");
     const obj = { username: user, password, email };
     if (user === "" || password === "" || email === "" || cpassword === "") {
       alert("Todos os campos devem estar preenchidos");
