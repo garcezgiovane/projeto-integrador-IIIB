@@ -18,7 +18,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      Desenvolvido por WhateverTech
+      Desenvolvido por WhateverTech 
+    
       {new Date().getFullYear()}
       {"."}
     </Typography>
