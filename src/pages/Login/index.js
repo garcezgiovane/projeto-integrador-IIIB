@@ -61,9 +61,12 @@ export default function Login() {
   const classes = useStyles();
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
   const [status, setStatus] = useState(false);
-  const [open, setOpen] = React.useState(false);
-  const [openModal, setOpenModal] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [openResetPassword, setOpenResetPassword] = useState(false);
 
   async function login() {
     const obj = { username: user, password };
@@ -79,7 +82,27 @@ export default function Login() {
   const handleClose = () => {
     setOpen(false);
     setOpenModal(false);
+    setOpenResetPassword(false);
   };
+
+  async function getRecoverPassword() {
+    if (confirmPass !== "" && password !== "") {
+      if (confirmPass === password) {
+        const response = await api.put(`/recover?resetToken=${resetToken}`, {
+          password,
+        });
+        setStatus(response.status);
+        setOpenResetPassword(false);
+        setOpenModal(false);
+      }
+    } else {
+      const response = await api.post("/recover", { email: user });
+      if (response.status === 200) {
+        setResetToken(response.data.resetTokenString);
+        setOpenResetPassword(true);
+      }
+    }
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -165,9 +188,41 @@ export default function Login() {
               autoFocus
               onChange={(e) => setUser(e.target.value)}
             />
+            {openResetPassword && (
+              <>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="user"
+                  label="Senha"
+                  name="user"
+                  autoComplete="user"
+                  autoFocus
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Confirmar senha"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                />
+              </>
+            )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="primary" autoFocus>
+            <Button
+              onClick={() => getRecoverPassword()}
+              color="primary"
+              autoFocus
+            >
               Enviar
             </Button>
           </DialogActions>
